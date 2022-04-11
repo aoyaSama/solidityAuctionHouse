@@ -29,6 +29,14 @@ contract VickreyAuction is Auction {
 
         // TODO: place your code here
     }
+    //You will implement this by editing VickreyAuction.sol. The contract takes as parameters:
+    // ● A minimum price. Bids below this are ignored (but the deposit is returned).
+    // ● A time period to submit bid commitments.
+    // ● A time period to reveal bids.
+    // ● A bid deposit amount.
+
+    // Bidders submit sealed bid commitments and later reveal them. Highest revealed bid wins but
+// pays only the price of the second highest revealed bid. Bidders who don’t reveal forfeit a deposit.
 
     // Record the player's bid commitment
     // Make sure exactly bidDepositAmount is provided (for new bids)
@@ -52,10 +60,10 @@ contract VickreyAuction is Auction {
 
     // finalize() must be extended here to provide a refund to the winner
     // based on the final sale price (the second highest bid, or reserve price).
-    function finalize() public override {
-        // TODO: place your code here
+    // function finalize() public override {
+    //     // TODO: place your code here
 
-        // call the general finalize() logic
-        super.finalize();
-    }
+    //     // call the general finalize() logic
+    //     super.finalize();
+    // }
 }

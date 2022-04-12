@@ -11,7 +11,6 @@ contract DutchAuction is Auction {
 
     // TODO: place your code here
     uint private initialTime;
-    event Log(uint bidammount);
 
     // constructor
     constructor(address _sellerAddress,
@@ -32,11 +31,9 @@ contract DutchAuction is Auction {
 
 
     function bid() public payable{
-
+        // TODO: place your code here
         // bid happened before initial time or if big happened after initial + bidding period
         require(initialTime <= time() && time() < initialTime + biddingPeriod);
-        
-        emit Log(msg.value);
 
         require(msg.value >= currentPrice());
         winningPrice = msg.value;
@@ -46,16 +43,6 @@ contract DutchAuction is Auction {
         if (msg.value >= currentPrice()) refunds[winnerAddress] = msg.value - currentPrice();
         
         finalize();
-        // if(msg.value == currentPrice()){
-        //     winningPrice = msg.value;
-        //     winnerAddress = msg.sender;
-        //     finalize();
-        // }
-        // else if(msg.value >= currentPrice()){
-        //     winnerAddress = msg.sender;
-        //     winningPrice = msg.value;
-        //     refund();
-        // }
     }
 
     // calculates the current price by querying time() and

@@ -56,8 +56,11 @@ contract Auction {
     // If no judge is specified, anybody can call this.
     // If a judge is specified, then only the judge or winning bidder may call.
     function finalize() public virtual {
-        // fail if auction already finalised and no winner 
-        require(!finalized && winnerAddress != address(0));
+        // reject if auction already finalised 
+        require(!finalized);
+
+        // reject if no winner when finalising
+        // require(winnerAddress != address(0));
 
         // require(!refunded);
         if(judgeAddress != address(0))
@@ -97,75 +100,16 @@ contract Auction {
             payable(msg.sender).transfer(winningPrice);
         }
         else if(refunded && msg.sender == winnerAddress){
+            // if seller or judge ends early, then winner can get refund
             refunded = false;
             payable(msg.sender).transfer(refundAmount);
             refundAmount = 0;
         }
         else if(refunds[msg.sender] > 0){
+            // refund the full amount of their funds
             uint toRefund = refunds[msg.sender];
             refunds[msg.sender] = 0;
             payable(msg.sender).transfer(toRefund);
         }
-        
-        
-
-        // uint bidAmount = returnsPending[msg.sender];
-        // if (bidAmount > 0) {
-        //     // It is important to set this to zero because the recipient
-        //     // can call this function again as part of the receiving call
-        //     // before `send` returns.
-        //     returnsPending[msg.sender] = 0;
-        //     if (!msg.sender.send(bidAmount)) {
-        //         //Calling throw not necessary here, simply reset the bidAmount owing
-        //         returnsPending[msg.sender] = bidAmount;
-        //         return false;
-        //     }
-        // }
-        // return true;
-        // address withdrawalAccount;
-        // uint withdrawalAmount;
-
-        // if (canceled) {
-        //     // if the auction was canceled, everyone should simply be allowed to withdraw their funds
-        //     withdrawalAccount = msg.sender;
-        //     withdrawalAmount = fundsByBidder[withdrawalAccount];
-
-        // } else {
-        // // the auction finished without being canceled
-
-        //     if (msg.sender == owner) {
-        //         // the auction's owner should be allowed to withdraw the highestBindingBid
-        //         withdrawalAccount = highestBidder;
-        //         withdrawalAmount = highestBindingBid;
-        //         ownerHasWithdrawn = true;
-
-        //     } else if (msg.sender == highestBidder) {
-        //         // the highest bidder should only be allowed to withdraw the difference between their
-        //         // highest bid and the highestBindingBid
-        //         withdrawalAccount = highestBidder;
-        //         if (ownerHasWithdrawn) {
-        //             withdrawalAmount = fundsByBidder[highestBidder];
-        //         } else {
-        //             withdrawalAmount = fundsByBidder[highestBidder] - highestBindingBid;
-        //         }
-
-        //     } else {
-        //         // anyone who participated but did not win the auction should be allowed to withdraw
-        //         // the full amount of their funds
-        //         withdrawalAccount = msg.sender;
-        //         withdrawalAmount = fundsByBidder[withdrawalAccount];
-        //     }
-        // }
-
-        // if (withdrawalAmount == 0) throw;
-
-        // fundsByBidder[withdrawalAccount] -= withdrawalAmount;
-
-        // // send the funds
-        // if (!msg.sender.send(withdrawalAmount)) throw;
-
-        // LogWithdrawal(msg.sender, withdrawalAccount, withdrawalAmount);
-
     }
-
 }

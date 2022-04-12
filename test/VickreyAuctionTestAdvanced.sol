@@ -76,20 +76,7 @@ contract VickreyAuctionTestAdvanced {
         t.setTime(oldTime);
     }
 
-    function testMinimalBidder() public {
-        setupContracts();
 
-        payable(alice).transfer(5000);
-
-        commitBid(alice, 300, 9, true, "valid bid commitment should be accepted");
-        revealBid(alice, 300, 19, true, "valid bid reveal should be accepted");
-        t.setTime(20);
-        Assert.equal(address(alice), testAuction.getWinner(), "winner should be declared after auction end");
-        testAuction.finalize();
-        Assert.equal(address(alice).balance, 3700, "winner should not receive early refund");
-        alice.callWithdraw();
-        Assert.equal(address(alice).balance, 4700, "winner should receive partial refund");
-    }
 
     function testRevealChangedBid() public {
         setupContracts();

@@ -161,6 +161,7 @@ contract VickreyAuctionTestBasic {
         commitBid(alice, 340, 7, true, "valid bid commitment should be accepted");
         commitBid(bob, 380, 8, true, "valid bid commitment should be accepted");
         revealBid(alice, 320, 14, false, "incorrect bid reveal should be rejected");
+        revealBid(alice, 340, 14, true, "correct bid reveal shouldn't be rejected");
         bidderCounter += 1;
         bob.setNonce(bytes32(bidderCounter));
         revealBid(bob, 380, 16, false, "incorrect bid reveal should be rejected");

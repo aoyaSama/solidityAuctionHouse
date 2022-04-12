@@ -12,7 +12,6 @@ contract EnglishAuction is Auction {
     uint256 private initialTime;
     uint256 private winningBid;
 
-    event winningBidIncreased(address bidder, uint256 bidAmount);
     event Log(uint256 bidAmount);
 
     // constructor

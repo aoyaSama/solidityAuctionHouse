@@ -12,8 +12,6 @@ contract EnglishAuction is Auction {
     uint256 private initialTime;
     uint256 private winningBid;
 
-    event Log(uint256 bidAmount);
-
     // constructor
     constructor(
         address _sellerAddress,
@@ -42,28 +40,22 @@ contract EnglishAuction is Auction {
         else // If the bid is not greater, the money is sent back.
             require(msg.value >= winningBid + minimumPriceIncrement);
 
-        if (winnerAddress != address(0)) {
-            // Sending the money back by simply using
-            // winningBidder.send(winningBid) is a risk to the security
-            // since it could execute a contract that is not trusted.
-            // It is always preferable to let the recipients
-            // withdraw their money themselves.
+        if (winnerAddress != address(0))
+            //value of the previous bid made available immediately 
+            // for withdrawal by the previous bidder
             refunds[winnerAddress] += winningBid;
-        }
+
         winnerAddress = msg.sender;
         winningBid = msg.value;
         initialTime = time();
-        emit Log(address(winnerAddress).balance);
-        emit Log(address(this).balance);
-        // winningBidIncreased(msg.sender, msg.value);
     }
 
     // Need to override the default implementation
     function getWinner() public view override returns (address winner) {
-        // no winner should be declared before deadline
-        if(time() < initialTime + biddingPeriod) return address(0);
-
-        return winnerAddress;
-        // TODO: place your code here
+        // no winner is annouced before auction bidding time is over
+        if(time() < initialTime + biddingPeriod) 
+            return address(0);
+        else
+            return winnerAddress;
     }
 }

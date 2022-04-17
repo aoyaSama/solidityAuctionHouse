@@ -11,6 +11,7 @@ contract VickreyAuction is Auction {
     uint public bidDepositAmount;
 
     // TODO: place your code here
+    uint private initialTime;
     mapping(address => bytes32) bids;
     mapping(address => uint) bidValues;
     mapping(address => bool) deposits;
@@ -37,14 +38,14 @@ contract VickreyAuction is Auction {
         revealDeadline = time() + _biddingPeriod + _revealPeriod;
 
         // TODO: place your code here
+        initialTime = time();
     }
 
     // Record the player's bid commitment
-    // Bidders can update their previous bid for free if desired.
     function commitBid(bytes32 bidCommitment) public payable {
         // TODO: place your code here
         // Only allow commitments before biddingDeadline
-        require(time() < biddingDeadline);
+        require(initialTime <= time() && time() < biddingDeadline);
 
         // Make sure exactly bidDepositAmount is provided (for new bids)
         if(bids[msg.sender] == 0)

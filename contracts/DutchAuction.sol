@@ -31,8 +31,8 @@ contract DutchAuction is Auction {
 
 
     function bid() public payable{
-        // TODO: place your code here
-        // bid happened before initial time or if big happened after initial + bidding period
+        // bid happened before initial time or 
+        // if big happened after initial + bidding period
         require(initialTime <= time() && time() < initialTime + biddingPeriod);
 
         require(msg.value >= currentPrice());
@@ -40,7 +40,8 @@ contract DutchAuction is Auction {
         winnerAddress = msg.sender;
 
         // if excess amount, then set a refund amount
-        if (msg.value >= currentPrice()) refunds[winnerAddress] = msg.value - currentPrice();
+        if (msg.value >= currentPrice()) 
+            refunds[winnerAddress] = msg.value - currentPrice();
         
         finalize();
     }

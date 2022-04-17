@@ -18,7 +18,7 @@ contract Auction {
     uint refundAmount = 0;
     uint soldAmount = 0;
 
-    // Allowed withdrawals of bids
+    // mapping of withdrawable funds by all bidders
     mapping(address => uint256) refunds;
 
     // constructor
@@ -51,18 +51,16 @@ contract Auction {
         return winningPrice;
     }
 
-    // Don’t allow any calls to  call finalize() or refund() before the auction is over.
-    
+    // Don’t allow any calls to call finalize() or refund() before the auction is over.
     // If no judge is specified, anybody can call this.
-    // If a judge is specified, then only the judge or winning bidder may call.
     function finalize() public virtual {
         // reject if auction already finalised 
         require(!finalized);
 
         // reject if no winner when finalising
-        // require(winnerAddress != address(0));
+        require(winnerAddress != address(0));
 
-        // require(!refunded);
+        // If a judge is specified, then only the judge or winning bidder may call.
         if(judgeAddress != address(0))
             require(msg.sender == judgeAddress || msg.sender == winnerAddress);
 
@@ -70,28 +68,34 @@ contract Auction {
         finalized = true;
     }
 
-    // This can ONLY be called by seller or the judge (if a judge exists).
     // Money should only be refunded to the winner.
     function refund() public {
-        // cannot refund if already auction already finalised abd if there isn't a winner
-        require(!finalized && winnerAddress != address(0));
+        // cannot refund if already auction already finalised
+        require(!finalized);
 
+        // cannot call to refund twice
+        require(!refunded);
+
+        // reject if no winner when finalising
+        require(winnerAddress != address(0));
+
+        // ONLY be called by seller or the judge (if a judge exists).
         if(judgeAddress != address(0))
             require(msg.sender == judgeAddress || msg.sender == sellerAddress);
         else
             require(msg.sender == sellerAddress);
+        
+        // add amount into refunds
+        refunds[winnerAddress] = winningPrice;
 
-        refundAmount = winningPrice;
         // since it's refunded, the winning price goes back to 0
-        winningPrice = 0;
+        winningPrice = 0; 
+        
         refunded = true;
     }
 
     // Withdraw funds from the contract.
     // If called, all funds available to the caller should be refunded.
-    // This should be the *only* place the contract ever transfers funds out.
-    // Ensure that your withdrawal functionality is not vulnerable to
-    // re-entrancy or unchecked-spend vulnerabilities.
     function withdraw() public {
         
         if(finalized && msg.sender == sellerAddress && soldAmount > 0){
@@ -99,13 +103,8 @@ contract Auction {
             soldAmount = 0;
             payable(msg.sender).transfer(winningPrice);
         }
-        else if(refunded && msg.sender == winnerAddress){
-            // if seller or judge ends early, then winner can get refund
-            refunded = false;
-            payable(msg.sender).transfer(refundAmount);
-            refundAmount = 0;
-        }
         else if(refunds[msg.sender] > 0){
+            // if seller or judge ends early, then winner can get refund
             // refund the full amount of their funds
             uint toRefund = refunds[msg.sender];
             refunds[msg.sender] = 0;

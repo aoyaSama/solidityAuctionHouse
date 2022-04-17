@@ -37,11 +37,7 @@ contract VickreyAuction is Auction {
         revealDeadline = time() + _biddingPeriod + _revealPeriod;
 
         // TODO: place your code here
-        // bidderCounter;
     }
-
-    // Bidders submit sealed bid commitments and later reveal them. Highest revealed bid wins but
-    // pays only the price of the second highest revealed bid. Bidders who don’t reveal forfeit a deposit.
 
     // Record the player's bid commitment
     // Bidders can update their previous bid for free if desired.
@@ -125,8 +121,7 @@ contract VickreyAuction is Auction {
             }
         }
 
-        emit Log(winningPrice);
-        emit Log(bidValues[winnerAddress]);
+        // pay only the price of the second highest revealed bid, refund rest
         refunds[winnerAddress] += bidValues[winnerAddress] - winningPrice;
         bidValues[winnerAddress] = 0;
 
@@ -134,7 +129,7 @@ contract VickreyAuction is Auction {
         super.finalize();
     }
 
-    // returns the bidder with the highest bid
+    // returns the bidder with the highest bid and the second highest bid
     function getHighestBidder() public view returns (address winner, uint){
         uint highestBid = minimumPrice;
         uint secondHighest = 0;

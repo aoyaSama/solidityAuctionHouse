@@ -66,9 +66,4 @@ contract EnglishAuction is Auction {
         return winnerAddress;
         // TODO: place your code here
     }
-
-    // function currentPrice() private view returns (uint){
-    //     uint timeSinceStart = time() - initialTime;
-    //     return initialPrice - timeSinceStart*offerPriceDecrement;
-    // }
 }

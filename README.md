@@ -25,6 +25,22 @@ In this project, develop some Ethereum contracts to implement decentralised auct
 
     An offline Vickrey auction proceeds as follows: all participants submit their bid in a sealed envelope. The auctioneer then opens all of the envelopes, and the highest bidder obtains the offering but only pays the price specified by the second-highest bidder (hence the term second-price auction). You can see intuitively why this is equivalent to the outcome an English auction would have eventually produced: this is the price the highest bidder would have needed to pay (perhaps plus a small increment) to outbid their closest competitor in an English auction.
 
+## Requirement
+Truffle
+Ganache
+Dev Container for Ethereum
+
+### Run test
+
+```bash
+truffle test
+```
+
+To run individual tests
+```bash
+truffle test test/Bidders.sol test/TestFramework.sol test/<test_name>.sol
+```
+
 ## Author
 Auction.sol, DutchAuction.sol, EnglishAuction.sol, and VickreyAuction.sol by Takemitsu Yamanaka #757038
 

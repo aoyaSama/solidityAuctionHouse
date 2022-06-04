@@ -35,13 +35,12 @@ contract EnglishAuction is Auction {
         require(initialTime <= time() && time() < initialTime + biddingPeriod);
 
         // check if inital bet
-        if(time() == initialTime)
-            require(msg.value >= winningBid);
-        else // If the bid is not greater, the money is sent back.
-            require(msg.value >= winningBid + minimumPriceIncrement);
+        if (time() == initialTime)
+            require(msg.value >= winningBid); // If the bid is not greater, the money is sent back.
+        else require(msg.value >= winningBid + minimumPriceIncrement);
 
         if (winnerAddress != address(0))
-            //value of the previous bid made available immediately 
+            //value of the previous bid made available immediately
             // for withdrawal by the previous bidder
             refunds[winnerAddress] += winningBid;
 
@@ -53,9 +52,7 @@ contract EnglishAuction is Auction {
     // Need to override the default implementation
     function getWinner() public view override returns (address winner) {
         // no winner is annouced before auction bidding time is over
-        if(time() < initialTime + biddingPeriod) 
-            return address(0);
-        else
-            return winnerAddress;
+        if (time() < initialTime + biddingPeriod) return address(0);
+        else return winnerAddress;
     }
 }

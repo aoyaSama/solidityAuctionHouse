@@ -4,34 +4,33 @@ pragma solidity ^0.8.13;
 import "./Auction.sol";
 
 contract VickreyAuction is Auction {
-
-    uint public minimumPrice;
-    uint public biddingDeadline;
-    uint public revealDeadline;
-    uint public bidDepositAmount;
+    uint256 public minimumPrice;
+    uint256 public biddingDeadline;
+    uint256 public revealDeadline;
+    uint256 public bidDepositAmount;
 
     // TODO: place your code here
-    uint private initialTime;
+    uint256 private initialTime;
     mapping(address => bytes32) bids;
-    mapping(address => uint) bidValues;
+    mapping(address => uint256) bidValues;
     mapping(address => bool) deposits;
 
-    uint private bidders = 0;
+    uint256 private bidders = 0;
     address[] revealedBidders;
 
-    event Log(uint bidAmount);
+    event Log(uint256 bidAmount);
     event xLog(bytes32 encoded);
 
     // constructor
-    constructor(address _sellerAddress,
-                            address _judgeAddress,
-                            address _timerAddress,
-                            uint _minimumPrice,
-                            uint _biddingPeriod,
-                            uint _revealPeriod,
-                            uint _bidDepositAmount)
-             Auction (_sellerAddress, _judgeAddress, _timerAddress) {
-
+    constructor(
+        address _sellerAddress,
+        address _judgeAddress,
+        address _timerAddress,
+        uint256 _minimumPrice,
+        uint256 _biddingPeriod,
+        uint256 _revealPeriod,
+        uint256 _bidDepositAmount
+    ) Auction(_sellerAddress, _judgeAddress, _timerAddress) {
         minimumPrice = _minimumPrice;
         bidDepositAmount = _bidDepositAmount;
         biddingDeadline = time() + _biddingPeriod;
@@ -48,17 +47,16 @@ contract VickreyAuction is Auction {
         require(initialTime <= time() && time() < biddingDeadline);
 
         // Make sure exactly bidDepositAmount is provided (for new bids)
-        if(bids[msg.sender] == 0)
-            require(msg.value == bidDepositAmount);
-        else // Bet is free now, so reject if bidder put another deposit
-            require(msg.value == 0);
-        
+        if (bids[msg.sender] == 0)
+            require(msg.value == bidDepositAmount); // Bet is free now, so reject if bidder put another deposit
+        else require(msg.value == 0);
+
         bids[msg.sender] = bidCommitment;
     }
 
     // Check that the bid (msg.value) matches the commitment.
     // If the bid is correctly opened, the bidder can withdraw their deposit.
-    function revealBid(bytes32 nonce) public payable{
+    function revealBid(bytes32 nonce) public payable {
         // TODO: place your code here
 
         // reject early reveal
@@ -71,32 +69,30 @@ contract VickreyAuction is Auction {
         require(bid == bids[msg.sender]);
 
         // once bid correctly revealed, then deposit can be returned
-        if(bids[msg.sender] != 0)
-            refunds[msg.sender] += bidDepositAmount;
-        
+        if (bids[msg.sender] != 0) refunds[msg.sender] += bidDepositAmount;
+
         // check if bid higher than minimum price, if not refund the bidder
-        if(msg.value >= minimumPrice){
+        if (msg.value >= minimumPrice) {
             bidValues[msg.sender] = msg.value;
             revealedBidders.push(msg.sender);
             bidders += 1;
-        }
-        else{
+        } else {
             refunds[msg.sender] += msg.value;
         }
     }
 
     // Need to override the default implementation
-    function getWinner() public override view returns (address winner){
+    function getWinner() public view override returns (address winner) {
         // TODO: place your code here
 
         // no winner should declared before deadline nor when there isn't a valid bid
-        if(time() < revealDeadline || revealedBidders.length == 0) 
+        if (time() < revealDeadline || revealedBidders.length == 0)
             winner = address(0);
-        else if (revealedBidders.length == 1) // only 1 valid bid
+        else if (revealedBidders.length == 1)
+            // only 1 valid bid
             winner = revealedBidders[0];
-        else if (revealedBidders.length > 1)
-            (winner, ) = getHighestBidder();
-        
+        else if (revealedBidders.length > 1) (winner, ) = getHighestBidder();
+
         return winner;
     }
 
@@ -105,18 +101,17 @@ contract VickreyAuction is Auction {
     function finalize() public override {
         // TODO: place your code here
 
-        if (revealedBidders.length == 1){ // only 1 valid bid
+        if (revealedBidders.length == 1) {
+            // only 1 valid bid
             winnerAddress = revealedBidders[0];
             winningPrice = minimumPrice;
-        } 
-        else if (revealedBidders.length > 1){
+        } else if (revealedBidders.length > 1) {
             (winnerAddress, winningPrice) = getHighestBidder();
 
             // set refund amount for each bidder
-            for(uint i = 0; i < revealedBidders.length; i++) {
+            for (uint256 i = 0; i < revealedBidders.length; i++) {
                 address bidder = revealedBidders[i];
-                if(bidder == winnerAddress)
-                    continue;
+                if (bidder == winnerAddress) continue;
                 refunds[bidder] += bidValues[bidder];
                 bidValues[bidder] = 0;
             }
@@ -131,21 +126,21 @@ contract VickreyAuction is Auction {
     }
 
     // returns the bidder with the highest bid and the second highest bid
-    function getHighestBidder() public view returns (address winner, uint){
-        uint highestBid = minimumPrice;
-        uint secondHighest = 0;
-        for(uint i = 0; i < revealedBidders.length; i++) {
-            if(bidValues[revealedBidders[i]] > highestBid){
+    function getHighestBidder() public view returns (address winner, uint256) {
+        uint256 highestBid = minimumPrice;
+        uint256 secondHighest = 0;
+        for (uint256 i = 0; i < revealedBidders.length; i++) {
+            if (bidValues[revealedBidders[i]] > highestBid) {
                 secondHighest = highestBid;
                 highestBid = bidValues[revealedBidders[i]];
                 winner = revealedBidders[i];
             }
-            if(secondHighest < bidValues[revealedBidders[i]] 
-                    && bidValues[revealedBidders[i]] < highestBid)
-                secondHighest = bidValues[revealedBidders[i]];
+            if (
+                secondHighest < bidValues[revealedBidders[i]] &&
+                bidValues[revealedBidders[i]] < highestBid
+            ) secondHighest = bidValues[revealedBidders[i]];
         }
-        if(secondHighest == 0)
-            secondHighest = minimumPrice;
+        if (secondHighest == 0) secondHighest = minimumPrice;
 
         return (winner, secondHighest);
     }

@@ -3,19 +3,18 @@ pragma solidity ^0.8.13;
 
 // Simple contract to store time. You should not need to be modify this contract.
 contract Timer {
-
-    uint time;
-    uint startTime;
+    uint256 time;
+    uint256 startTime;
     address owner;
 
     // constructor
-    constructor(uint _startTime) {
+    constructor(uint256 _startTime) {
         owner = msg.sender;
         time = _startTime;
         startTime = _startTime;
     }
 
-    function getTime() public view returns (uint) {
+    function getTime() public view returns (uint256) {
         return time;
     }
 
@@ -23,15 +22,15 @@ contract Timer {
         time = startTime;
     }
 
-    function setTime(uint _newTime) public ownerOnly {
+    function setTime(uint256 _newTime) public ownerOnly {
         time = _newTime;
     }
 
-    function offsetTime(uint _offset) public ownerOnly {
+    function offsetTime(uint256 _offset) public ownerOnly {
         time += _offset;
     }
 
-    modifier ownerOnly {
+    modifier ownerOnly() {
         require(msg.sender == owner, "Can only be called by owner.");
         _;
     }

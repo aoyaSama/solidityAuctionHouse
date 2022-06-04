@@ -3,7 +3,7 @@ module.exports = {
   // to customize your Truffle configuration!
   networks: {
     development: {
-      host: "172.22.224.1",
+      host: "172.27.160.1",
       port: 7545,
       network_id: "*"
     },
@@ -13,5 +13,5 @@ module.exports = {
       version: "0.8.13"
     }
   },
-  plugins: ["truffle-contract-size"]
+  plugins: ["truffle-contract-size", "solidity-coverage"]
 };
